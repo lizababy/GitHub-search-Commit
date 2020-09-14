@@ -4,8 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.lbapplication.model.CommitResponse
 import com.example.lbapplication.network.GitHubSearchCommitApi
+import com.example.lbapplication.utils.OWNER
+import com.example.lbapplication.utils.REPO
 import com.example.lbapplication.view.CommitListAdapter
-import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -23,7 +24,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun loadCommits() {
-        subscription = gitHubSearchCommitApi.getGithubSearchCommitResponse()
+        subscription = gitHubSearchCommitApi.getGithubSearchCommitResponse(OWNER, REPO)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(this::onSuccess, this::onError)
@@ -31,7 +32,8 @@ class MainViewModel @Inject constructor(
 
     private fun onSuccess(commitList: List<CommitResponse>) {
         val commitItemViewModels : MutableList<CommitItemViewModel> =
-            commitList.map { CommitItemViewModel(it.sha, it.author.login, it.commit.message) }.toMutableList()
+            commitList.mapIndexed { index, commitResponse ->
+                CommitItemViewModel(commitResponse.author.login, "Commit #${index+1}: ${commitResponse.sha}", commitResponse.commit.message) }.toMutableList()
         adapter.setData(commitItemViewModels)
     }
 
