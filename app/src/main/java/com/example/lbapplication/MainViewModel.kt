@@ -10,6 +10,7 @@ import com.example.lbapplication.view.CommitListAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(
@@ -31,9 +32,17 @@ class MainViewModel @Inject constructor(
     }
 
     private fun onSuccess(commitList: List<CommitResponse>) {
-        val commitItemViewModels : MutableList<CommitItemViewModel> =
-            commitList.mapIndexed { index, commitResponse ->
-                CommitItemViewModel(commitResponse.author.login, "Commit #${index+1}: ${commitResponse.sha}", commitResponse.commit.message) }.toMutableList()
+
+        val commitItemViewModels: MutableList<CommitItemViewModel> =
+            commitList
+                .sortedBy { ZonedDateTime.parse(it.commit.author.date) }
+                .mapIndexed { index, commitResponse ->
+                    CommitItemViewModel(
+                        commitResponse.author.login,
+                        "Commit #${index + 1}: ${commitResponse.sha}",
+                        commitResponse.commit.message
+                    )
+                }.toMutableList()
         adapter.setData(commitItemViewModels)
     }
 
