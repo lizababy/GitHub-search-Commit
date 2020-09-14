@@ -1,7 +1,6 @@
 package com.example.lbapplication.di
 
-import com.example.lbapplication.MainActivity
-import com.example.lbapplication.MainViewModel
+import com.example.lbapplication.view.MainActivity
 import dagger.Component
 import javax.inject.Singleton
 
